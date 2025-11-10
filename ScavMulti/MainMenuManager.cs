@@ -40,7 +40,7 @@ public static class MainMenuManager
 
 		connectButton.onClick.AddListener(() =>
 		{
-			OnConnectClicked(inputField.text);
+			OnConnectClicked?.Invoke(inputField.text);
 		});
 		UiUtils.ForceRealodObject(netCanvasObject);
 

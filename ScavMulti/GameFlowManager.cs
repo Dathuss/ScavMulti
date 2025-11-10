@@ -11,21 +11,21 @@ public static class GameFlowManager
 	[HarmonyPatch(typeof(global::PreRunScript), nameof(global::PreRunScript.StartRun))]
 	static void PreRunScript_StartRun_Prefix()
 	{
-		OnRunStart(runStartType: RunStartType.NewRun);
+		OnRunStart?.Invoke(runStartType: RunStartType.NewRun);
 	}
 
 	[HarmonyPrefix]
 	[HarmonyPatch(typeof(global::PreRunScript), nameof(global::PreRunScript.LoadRun))]
 	static void PreRunScript_LoadRun_Prefix()
 	{
-		OnRunStart(runStartType: RunStartType.Continue);
+		OnRunStart?.Invoke(runStartType: RunStartType.Continue);
 	}
 
 	[HarmonyPrefix]
 	[HarmonyPatch(typeof(global::PlayerCamera), nameof(global::PlayerCamera.ToMainMenu))]
 	static void PlayerCamera_ToMainMenu_Prefix()
 	{
-		OnRunLeave();
+		OnRunLeave?.Invoke();
 	}
 
 	[HarmonyPrefix]
@@ -33,7 +33,7 @@ public static class GameFlowManager
 	static void WorldGeneration_InstantiateWorld_Prefix()
 	{
 		IsWorldGenerating = true;
-		OnWorldGenStart();
+		OnWorldGenStart?.Invoke();
 	}
 
 	[HarmonyPostfix]
@@ -41,14 +41,14 @@ public static class GameFlowManager
 	static void WorldGeneration_FinishWorldGeneration_Postfix()
 	{
 		IsWorldGenerating = false;
-		OnWorldGenEnd();
+		OnWorldGenEnd?.Invoke();
 	}
 
 	public static IEnumerator StartRun(RunStartType runStartType)
 	{
 		if (!MainMenuManager.MenuInstance)
 			throw new InvalidOperationException("StartRun called when not in main menu");
-		OnRunStart(runStartType);
+		OnRunStart?.Invoke(runStartType);
 		return MainMenuManager.MenuInstance.WaitLoad();
 	}
 
