@@ -27,6 +27,8 @@ public class Plugin : BaseUnityPlugin
 			RunInfo.Init();
 			ClientManager.CreateInstance();
 			ServerManager.CreateInstance();
+			MessageHandler.CreateInstance();
+			ExperimentInfo.SetupHooks();
 		}
 		catch (Exception e)
 		{

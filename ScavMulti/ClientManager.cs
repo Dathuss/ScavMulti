@@ -104,6 +104,10 @@ public class ClientManager : MonoBehaviour
 			_isJoiningWorld = false;
 			_isRunning = true;
 
+			Experiments.AddExperiment(-1, _worldInfo.CurrentExperimentPos);
+		}
+	}
+
 	void LateUpdate()
 	{
 		if (_isRunning)
@@ -111,6 +115,11 @@ public class ClientManager : MonoBehaviour
 			while (_endpoint.IsRunning && !_endpoint.IsEmpty)
 			{
 				var message = _endpoint.Dequeue();
+				if (message is ClientConnected clientConnected)
+					Experiments.AddExperiment(clientConnected.Id, clientConnected.Position);
+				else if (message is ClientDisconnected clientDisconnected)
+					Experiments.RemoveExperiment(clientDisconnected.Id);
+				else
 					MessageHandler.Instance.HandleMessage(message);
 			}
 		}

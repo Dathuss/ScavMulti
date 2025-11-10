@@ -57,6 +57,7 @@ public class ServerManager : MonoBehaviour
 			foreach (var deadClient in _server.RemoveDeadClients())
 			{
 				MessageDispatcher.DispatchMessage(new ClientDisconnected(deadClient.Id));
+				Experiments.RemoveExperiment(deadClient.Id);
 				Logger.LogWarning($"Client is leaving. Exception: {deadClient.ClientCancelledException}");
 			}
 
@@ -76,19 +77,20 @@ public class ServerManager : MonoBehaviour
 
 				_server.AcceptClient(pendingClient);
 
-				pendingClient.Enqueue(new PeerHandshake());
+				var mainBodyPos = global::PlayerCamera.main.body.transform.position;
+				pendingClient.Enqueue(new PeerHandshake(pendingClient.Id));
 				pendingClient.Enqueue(new WorldInfo(
 					WorldGeneration.world.chunkWidth,
 					WorldGeneration.world.chunkHeight,
 					(uint)WorldGeneration.CHUNKSIZE,
-					global::PlayerCamera.main.body.transform.position.x,
-					global::PlayerCamera.main.body.transform.position.y,
+					mainBodyPos,
 					RunInfo.WorldGenSeed,
 					WorldGeneration.world.biomeDepth,
 					RunInfo.ModifiedBlocks,
 					RunInfo.DestroyedEntityIds
 				));
 				MessageDispatcher.ForwardMessage(new ClientConnected(pendingClient.Id, mainBodyPos), pendingClient.Id);
+				Experiments.AddExperiment(pendingClient.Id, mainBodyPos);
 			}
 		}
 	}
