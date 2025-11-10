@@ -17,7 +17,7 @@ public class MainExperiment : ExperimentInfo
 		Instance = obj.AddComponent<MainExperiment>();
 	}
 
-	void Update()
+	void LateUpdate()
 	{
 		if (MessageDispatcher.IsAvailable)
 		{
