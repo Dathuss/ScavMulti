@@ -15,7 +15,7 @@ namespace ScavMulti.Network;
 public partial class Client : IDisposable
 {
 	public Socket Sock { get; private set; }
-	private readonly ConcurrentQueue<(byte[], int)> _inputQueue;
+	private readonly ConcurrentQueue<(byte[] array, int length, bool isPooled)> _inputQueue;
 	private readonly ConcurrentQueue<MessageBase> _outputQueue;
 	private readonly MemoryStream _sendIntermediateStream;
 	private readonly Sender _sender;
@@ -67,7 +67,14 @@ public partial class Client : IDisposable
 				Buffer.MemoryCopy(src, dest, length * sizeof(byte), length * sizeof(byte));
 			}
 		}
-		_inputQueue.Enqueue((array, length));
+		_inputQueue.Enqueue((array, length, true));
+		_inputQueueEnqueuedEvent.Release();
+	}
+
+	public void Enqueue(byte[] array, int length, bool isArrayRented)
+	{
+		AssertIsRunning();
+		_inputQueue.Enqueue((array, length, isArrayRented));
 		_inputQueueEnqueuedEvent.Release();
 	}
 
@@ -155,14 +162,15 @@ public partial class Client : IDisposable
 	{
 		try
 		{
-			(byte[], int) toSend;
+			(byte[] array, int length, bool isPooled) toSend;
 			bool clientDisconnected;
 			while (!_cancellationContext.Token.IsCancellationRequested)
 			{
 				while (!_inputQueue.TryDequeue(out toSend))
 					await _inputQueueEnqueuedEvent.WaitAsync(_cancellationContext.Token);
-				clientDisconnected = !await SendFullAsync(toSend.Item1, toSend.Item2);
-				ArrayPool<byte>.Shared.Return(toSend.Item1);
+				clientDisconnected = !await SendFullAsync(toSend.array, toSend.length);
+				if (toSend.isPooled)
+					ArrayPool<byte>.Shared.Return(toSend.array);
 				if (clientDisconnected)
 				{
 					_cancellationContext.CancelFromSend(null);

@@ -1,10 +1,14 @@
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading.Tasks;
+using System.Buffers.Binary;
+using MessagePack;
+using ScavMulti.Network.Messages;
 
 namespace ScavMulti.Network;
 
@@ -15,6 +19,7 @@ public class Server : IEnumerable<Client>, IDisposable
 	private readonly TcpListener _listener;
 	private readonly ConcurrentBag<Client> _pendingClients;
 	private readonly List<Client> _clients;
+	private readonly MemoryStream _sendToAllStream;
 	public bool IsRunning { get; private set; }
 
 	public Server(IPEndPoint ep)
@@ -23,6 +28,7 @@ public class Server : IEnumerable<Client>, IDisposable
 		_listener.Server.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, 1);
 		_clients = new(10);
 		_pendingClients = new();
+		_sendToAllStream = new();
 		IsRunning = false;
 	}
 
@@ -94,6 +100,52 @@ public class Server : IEnumerable<Client>, IDisposable
 			throw new InvalidOperationException("Not the current pending client");
 		}
 		client.Dispose();
+	}
+
+	private byte[] PrepareBufferForMultipleSend(MessageBase message, out int length)
+	{
+		_sendToAllStream.Position = sizeof(int);
+		MessagePackSerializer.Serialize<MessageBase>(_sendToAllStream, message);
+		length = (int)_sendToAllStream.Position;
+		BinaryPrimitives.WriteInt32LittleEndian(_sendToAllStream.GetBuffer(), length - sizeof(int));
+		var array = new byte[length];
+		unsafe
+		{
+			fixed (byte* dest = array, src = _sendToAllStream.GetBuffer())
+			{
+				Buffer.MemoryCopy(src, dest, length * sizeof(byte), length * sizeof(byte));
+			}
+		}
+		return array;
+	}
+
+	public void SendToAllClients(MessageBase message)
+	{
+		var buffer = PrepareBufferForMultipleSend(message, out int length);
+		foreach (var client in _clients)
+		{
+			try
+			{
+				client.Enqueue(buffer, length, false);
+			}
+			catch (ClientCancelledException) { }
+		}
+	}
+
+	public void SendToAllClientsExcept(MessageBase message, int clientIdToNotSentTo)
+	{
+		// don't even serialize the message if there's only one client
+		if (_clients.Count == 1 && _clients[0].Id == clientIdToNotSentTo)
+			return;
+		var buffer = PrepareBufferForMultipleSend(message, out int length);
+		foreach (var client in _clients.Where(x => x.Id != clientIdToNotSentTo))
+		{
+			try
+			{
+				client.Enqueue(buffer, length, false);
+			}
+			catch (ClientCancelledException) { }
+		}
 	}
 
 	public void KillClient(Client client, bool throwOnNotFound = true)
