@@ -26,6 +26,14 @@ public abstract class ExperimentInfo : MonoBehaviour
 			MainCollider = BodyObject.GetComponent<BoxCollider2D>();
 			if (!MainCollider)
 				Logger.LogError("BoxCollider2D not found on Body Object");
+			else
+			{
+				var mask = LayerMask.NameToLayer("Body");
+				if (mask < 0)
+					Logger.LogError("'Body' collision mask does not exist");
+				else
+					MainCollider.excludeLayers |= 1 << mask;
+			}
 			var headTransform = Body.transform.Find("Head");
 			if (!headTransform)
 				Logger.LogError("Head Object not found as Body Child");
