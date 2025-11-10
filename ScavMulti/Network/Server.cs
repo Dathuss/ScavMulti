@@ -20,6 +20,7 @@ public class Server : IEnumerable<Client>, IDisposable
 	private readonly ConcurrentBag<Client> _pendingClients;
 	private readonly List<Client> _clients;
 	private readonly MemoryStream _sendToAllStream;
+	private int _incrementalId;
 	public bool IsRunning { get; private set; }
 
 	public Server(IPEndPoint ep)
@@ -29,6 +30,7 @@ public class Server : IEnumerable<Client>, IDisposable
 		_clients = new(10);
 		_pendingClients = new();
 		_sendToAllStream = new();
+		_incrementalId = 0;
 		IsRunning = false;
 	}
 
@@ -88,6 +90,7 @@ public class Server : IEnumerable<Client>, IDisposable
 		}
 		client.Start();
 		_clients.Add(client);
+		client.Id = _incrementalId++;
 	}
 
 	public void RefuseClient(Client client)

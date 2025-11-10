@@ -22,6 +22,26 @@ public partial class Client : IDisposable
 	private readonly Receiver _receiver;
 	private readonly SemaphoreSlim _inputQueueEnqueuedEvent;
 	private readonly ClientCancellationContext _cancellationContext;
+	private bool _idHasBeenSet = false;
+	private int _id = int.MinValue;
+	public int Id
+	{
+		// the id cannot be immediately set on constructor because
+		// it needs to be sent by the server first
+		get
+		{
+			if (!_idHasBeenSet)
+				throw new InvalidOperationException("Client.Id field accessed before it has been set");
+			return _id;
+		}
+		set
+		{
+			if (_idHasBeenSet)
+				throw new InvalidOperationException("Client.Id field has already been set");
+			_idHasBeenSet = true;
+			_id = value;
+		}
+	}
 	public ClientState State => _cancellationContext.State;
 	public bool IsRunning => _cancellationContext.State == ClientState.Running;
 	public ClientCancelledException ClientCancelledException => _cancellationContext.ClientCancelledException;

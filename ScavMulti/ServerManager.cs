@@ -64,13 +64,8 @@ public class ServerManager : MonoBehaviour
 			{
 				while (client.IsRunning && !client.IsEmpty)
 				{
-					var data = client.Dequeue();
-					switch (data)
-					{
-						default:
-							Logger.LogError($"Unknown or unimplemented message received: {data.GetType()}");
-							break;
-					}
+					var message = client.Dequeue();
+					message.SourceId = client.Id;
 				}
 			}
 

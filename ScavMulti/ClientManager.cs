@@ -45,7 +45,8 @@ public class ClientManager : MonoBehaviour
 		_endpoint.Start();
 		Logger.LogInfo("Connection accepted, receiving handshake");
 		yield return _endpoint.WaitUntilHasData();
-		_endpoint.Dequeue<PeerHandshake>();
+		int myId = _endpoint.Dequeue<PeerHandshake>().YourId;
+		_endpoint.Id = myId;
 		Logger.LogInfo("Received handshake");
 		yield return _endpoint.WaitUntilHasData();
 		_worldInfo = _endpoint.Dequeue<WorldInfo>();

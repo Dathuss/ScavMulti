@@ -11,7 +11,10 @@ public record class Error(
 ) : MessageBase;
 
 [MessagePackObject]
-public record class PeerHandshake : MessageBase;
+public record class PeerHandshake(
+	// the id the server gave to the client receiving this message
+	[property: Key(0)] int YourId
+) : MessageBase;
 
 /// <summary>
 /// sent by the server after the handshake
