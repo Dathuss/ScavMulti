@@ -66,6 +66,7 @@ public class ServerManager : MonoBehaviour
 				{
 					var message = client.Dequeue();
 					message.SourceId = client.Id;
+					MessageHandler.Instance.HandleMessage(message);
 				}
 			}
 

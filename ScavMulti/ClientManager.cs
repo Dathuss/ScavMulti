@@ -91,6 +91,16 @@ public class ClientManager : MonoBehaviour
 			MessageDispatcher.SetEndpoint(_endpoint);
 			_isJoiningWorld = false;
 			_isRunning = true;
+
+	void LateUpdate()
+	{
+		if (_isRunning)
+		{
+			while (_endpoint.IsRunning && !_endpoint.IsEmpty)
+			{
+				var message = _endpoint.Dequeue();
+					MessageHandler.Instance.HandleMessage(message);
+			}
 		}
 	}
 
