@@ -14,8 +14,18 @@ public class ServerManager : MonoBehaviour
 	void Awake()
 	{
 		GameFlowManager.OnRunStart += OnRunStart;
-		GameFlowManager.OnRunLeave += OnRunLeave;
 		GameFlowManager.OnWorldGenEnd += OnWorldGenEnd;
+		GameFlowManager.OnRunLeave += () =>
+		{
+			if (_isRunning)
+			{
+				_server.Dispose();
+				_server = null;
+				_isRunning = false;
+				_willServerRun = false;
+				MessageDispatcher.ResetEndpoint();
+			}
+		};
 	}
 
 	void OnRunStart(RunStartType runStartType)
@@ -23,16 +33,6 @@ public class ServerManager : MonoBehaviour
 		if (runStartType == RunStartType.NewRun || runStartType == RunStartType.Continue)
 		{
 			_willServerRun = true;
-		}
-	}
-
-	void OnRunLeave()
-	{
-		if (_isRunning)
-		{
-			_server.Dispose();
-			_server = null;
-			_isRunning = false;
 		}
 	}
 

@@ -28,6 +28,18 @@ public class ClientManager : MonoBehaviour
 		};
 		GameFlowManager.OnWorldGenStart += OnWorldGenStart;
 		GameFlowManager.OnWorldGenEnd += OnWorldGenEnd;
+		GameFlowManager.OnRunLeave += () =>
+		{
+			if (_isRunning)
+			{
+				_isRunning = false;
+				_isJoiningWorld = false;
+				_endpoint.Dispose();
+				_endpoint = null;
+				_worldInfo = null;
+				MessageDispatcher.ResetEndpoint();
+			}
+		};
 	}
 
 	IEnumerator TryConnectToServer(string ipAddress)
