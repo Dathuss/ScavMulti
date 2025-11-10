@@ -21,7 +21,14 @@ public class MainExperiment : ExperimentInfo
 	{
 		if (MessageDispatcher.IsAvailable)
 		{
-			MessageDispatcher.DispatchMessage(new ExpieUpdate(Body.transform.position, RigidBody.velocity));
+			MessageDispatcher.DispatchMessage(new ExpieUpdate(
+				Body.transform.position,
+				RigidBody.velocity,
+				Body.moveDir,
+				Body.crouching,
+				Body.crouchAmount,
+				(Vector2)Body.targetLookPos
+			));
 		}
 	}
 }

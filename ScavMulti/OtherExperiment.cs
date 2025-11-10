@@ -20,6 +20,10 @@ public class OtherExperiment : ExperimentInfo
 	{
 		Body.transform.position = expieUpdate.Position;
 		RigidBody.velocity = expieUpdate.Velocity;
+		Body.moveDir = expieUpdate.MoveDir;
+		Body.crouching = expieUpdate.Crouching;
+		Body.crouchAmount = expieUpdate.CrouchAmount;
+		Body.targetLookPos = expieUpdate.TargetLookPos;
 	}
 
 	public static OtherExperiment CreateInstance(int id, Vector3 position)

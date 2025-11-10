@@ -49,5 +49,9 @@ public record class ClientDisconnected(
 [MessagePackObject]
 public record class ExpieUpdate(
 	[property: Key(0)] Vector2 Position,
-	[property: Key(1)] Vector2 Velocity
+	[property: Key(1)] Vector2 Velocity,
+	[property: Key(2)] Vector2 MoveDir,
+	[property: Key(3)] bool Crouching,
+	[property: Key(4)] float CrouchAmount,
+	[property: Key(5)] Vector2 TargetLookPos
 ) : MessageBase;
