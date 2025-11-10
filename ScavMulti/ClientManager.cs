@@ -87,6 +87,7 @@ public class ClientManager : MonoBehaviour
 		{
 			Logger.LogInfo("World gen finished, fixing world");
 			StartCoroutine(FixWorldCoroutine());
+			MessageDispatcher.SetEndpoint(_endpoint);
 			_isJoiningWorld = false;
 			_isRunning = true;
 		}

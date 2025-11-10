@@ -44,6 +44,7 @@ public class ServerManager : MonoBehaviour
 			var ep = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 5000); // TODO: change this
 			_server = new(ep);
 			_server.Run();
+			MessageDispatcher.SetEndpoint(_server);
 			_willServerRun = false;
 			_isRunning = true;
 		}
@@ -55,6 +56,7 @@ public class ServerManager : MonoBehaviour
 		{
 			foreach (var deadClient in _server.RemoveDeadClients())
 			{
+				MessageDispatcher.DispatchMessage(new ClientDisconnected(deadClient.Id));
 				Logger.LogWarning($"Client is leaving. Exception: {deadClient.ClientCancelledException}");
 			}
 
@@ -90,6 +92,7 @@ public class ServerManager : MonoBehaviour
 					RunInfo.ModifiedBlocks,
 					RunInfo.DestroyedEntityIds
 				));
+				MessageDispatcher.ForwardMessage(new ClientConnected(pendingClient.Id, mainBodyPos), pendingClient.Id);
 			}
 		}
 	}
