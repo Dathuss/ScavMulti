@@ -7,8 +7,10 @@ public abstract class ExperimentInfo : MonoBehaviour
 {
 	public int Id { get; protected set; } = int.MinValue;
 	public GameObject BodyObject;
+	public GameObject HeadObject;
 	public global::Body Body;
 	public Rigidbody2D RigidBody { get; private set; }
+	public BoxCollider2D MainCollider { get; private set; }
 
 	protected virtual void Start()
 	{
@@ -21,6 +23,14 @@ public abstract class ExperimentInfo : MonoBehaviour
 			RigidBody = BodyObject.GetComponent<Rigidbody2D>();
 			if (!RigidBody)
 				Logger.LogError("RigidBody2D not found on Body Object");
+			MainCollider = BodyObject.GetComponent<BoxCollider2D>();
+			if (!MainCollider)
+				Logger.LogError("BoxCollider2D not found on Body Object");
+			var headTransform = Body.transform.Find("Head");
+			if (!headTransform)
+				Logger.LogError("Head Object not found as Body Child");
+			else
+				HeadObject = headTransform.gameObject;
 		}
 	}
 
