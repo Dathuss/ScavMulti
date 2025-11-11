@@ -12,6 +12,7 @@ public class ClientManager : MonoBehaviour
 {
 	Client _endpoint;
 	WorldInfo _worldInfo;
+	bool _isTryingToConnect;
 	bool _isJoiningWorld = false;
 	bool _isRunning = false;
 
@@ -19,12 +20,15 @@ public class ClientManager : MonoBehaviour
 	{
 		MainMenuManager.OnConnectClicked += (ipAddress) =>
 		{
-			StartCoroutine(Utils.TryCoroutine(TryConnectToServer(ipAddress),
-				onError: (e) =>
-				{
-					MainMenuManager.SetConnectErrorText(e.Message);
-				})
-			);
+			if (!_isTryingToConnect)
+			{
+				StartCoroutine(Utils.TryCoroutine(TryConnectToServer(ipAddress),
+					onError: (e) =>
+					{
+						MainMenuManager.SetConnectErrorText(e.Message);
+					})
+				);
+			}
 		};
 		GameFlowManager.OnWorldGenStart += OnWorldGenStart;
 		GameFlowManager.OnWorldGenEnd += OnWorldGenEnd;
@@ -34,6 +38,7 @@ public class ClientManager : MonoBehaviour
 			{
 				_isRunning = false;
 				_isJoiningWorld = false;
+				_isTryingToConnect = false;
 				_endpoint.Dispose();
 				_endpoint = null;
 				_worldInfo = null;
@@ -44,26 +49,34 @@ public class ClientManager : MonoBehaviour
 
 	IEnumerator TryConnectToServer(string ipAddress)
 	{
-		var split = ipAddress.Split(':');
-		if (split.Length != 2)
-			throw new FormatException("Port not specified");
-		uint parsed = uint.Parse(split[1]);
-		var addr = IPAddress.Parse(split[0]);
-		var ep = new IPEndPoint(addr, (int)parsed);
-		var client = new Socket(ep.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-		client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, 1);
-		client.Connect(ep);
-		_endpoint = new Client(client);
-		_endpoint.Start();
-		Logger.LogInfo("Connection accepted, receiving handshake");
-		yield return _endpoint.WaitUntilHasData();
-		int myId = _endpoint.Dequeue<PeerHandshake>().YourId;
-		_endpoint.Id = myId;
-		Logger.LogInfo("Received handshake");
-		yield return _endpoint.WaitUntilHasData();
-		_worldInfo = _endpoint.Dequeue<WorldInfo>();
-		_isJoiningWorld = true;
-		yield return GameFlowManager.StartRun(RunStartType.Joining);
+		_isTryingToConnect = true;
+		try
+		{
+			var split = ipAddress.Split(':');
+			if (split.Length != 2)
+				throw new FormatException("Port not specified");
+			uint parsed = uint.Parse(split[1]);
+			var addr = IPAddress.Parse(split[0]);
+			var ep = new IPEndPoint(addr, (int)parsed);
+			var client = new Socket(ep.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+			client.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, 1);
+			client.Connect(ep);
+			_endpoint = new Client(client);
+			_endpoint.Start();
+			Logger.LogInfo("Connection accepted, receiving handshake");
+			yield return _endpoint.WaitUntilHasData();
+			int myId = _endpoint.Dequeue<PeerHandshake>().YourId;
+			_endpoint.Id = myId;
+			Logger.LogInfo("Received handshake");
+			yield return _endpoint.WaitUntilHasData();
+			_worldInfo = _endpoint.Dequeue<WorldInfo>();
+			_isJoiningWorld = true;
+			yield return GameFlowManager.StartRun(RunStartType.Joining);
+		}
+		finally
+		{
+			_isTryingToConnect = false;
+		}
 	}
 
 	void OnWorldGenStart()
