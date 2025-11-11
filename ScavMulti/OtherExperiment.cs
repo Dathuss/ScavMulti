@@ -34,6 +34,10 @@ public class OtherExperiment : ExperimentInfo
 				case AttackEvent:
 					Body.UseItemInHand();
 					break;
+				case BlockDamageEvent blockDamageEvent:
+					WorldLogic.IgnoreNextEvent();
+					global::WorldGeneration.world.DamageBlock(blockDamageEvent.Pos, blockDamageEvent.Damage, bonusMetal: blockDamageEvent.BonusMetal);
+					break;
 				default:
 					Logger.LogError($"Unknown or unimplemented event received on client {Id}: {evnt.GetType()}");
 					break;
@@ -46,6 +50,7 @@ public class OtherExperiment : ExperimentInfo
 		if (NetMode.Online)
 		{
 			// only show the animation and "disable" the damage done
+			// actual block damage is synced by other means
 			attackInfo.damage = 0;
 			attackInfo.structuralDamage = 0;
 			attackInfo.metalMoreDamage = false;
