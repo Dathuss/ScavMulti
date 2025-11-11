@@ -43,6 +43,7 @@ public class ClientManager : MonoBehaviour
 				_endpoint = null;
 				_worldInfo = null;
 				MessageDispatcher.ResetEndpoint();
+				NetMode.SetMode(NetMode.ModeClass.Offline);
 			}
 		};
 	}
@@ -114,6 +115,7 @@ public class ClientManager : MonoBehaviour
 			Logger.LogInfo("World gen finished, fixing world");
 			StartCoroutine(FixWorldCoroutine());
 			MessageDispatcher.SetEndpoint(_endpoint);
+			NetMode.SetMode(NetMode.ModeClass.IAmTheClient);
 			_isJoiningWorld = false;
 			_isRunning = true;
 

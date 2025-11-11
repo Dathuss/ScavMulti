@@ -8,27 +8,23 @@ public static class MessageDispatcher
 {
 	private static Server _serverInstance;
 	private static Client _clientInstance;
-	public static bool IsAvailable { get; private set; }
 
 	public static void SetEndpoint(Server serverInstance)
 	{
 		_serverInstance = serverInstance;
 		_clientInstance = null;
-		IsAvailable = true;
 	}
 
 	public static void SetEndpoint(Client clientInstance)
 	{
 		_clientInstance = clientInstance;
 		_serverInstance = null;
-		IsAvailable = true;
 	}
 
 	public static void ResetEndpoint()
 	{
 		_serverInstance = null;
 		_clientInstance = null;
-		IsAvailable = false;
 	}
 
 	public static void DispatchMessage(MessageBase message)

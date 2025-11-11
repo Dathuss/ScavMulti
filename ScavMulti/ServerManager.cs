@@ -24,6 +24,7 @@ public class ServerManager : MonoBehaviour
 				_isRunning = false;
 				_willServerRun = false;
 				MessageDispatcher.ResetEndpoint();
+				NetMode.SetMode(NetMode.ModeClass.Offline);
 			}
 		};
 	}
@@ -45,6 +46,7 @@ public class ServerManager : MonoBehaviour
 			_server = new(ep);
 			_server.Run();
 			MessageDispatcher.SetEndpoint(_server);
+			NetMode.SetMode(NetMode.ModeClass.IAmTheServer);
 			_willServerRun = false;
 			_isRunning = true;
 		}
