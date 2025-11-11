@@ -1,9 +1,11 @@
 using System;
 using UnityEngine;
+using HarmonyLib;
 using ScavMulti.Network.Messages;
 
 namespace ScavMulti;
 
+[HarmonyPatch]
 /// <summary>
 /// represents any Expie that is NOT you, the player on this computer
 /// </summary>
@@ -36,6 +38,18 @@ public class OtherExperiment : ExperimentInfo
 					Logger.LogError($"Unknown or unimplemented event received on client {Id}: {evnt.GetType()}");
 					break;
 			}
+		}
+	}
+
+	[HarmonyPrefix]
+	[HarmonyPatch(typeof(global::Body), nameof(global::Body.Attack))]
+	static void Body_Attack_Prefix(global::Body __instance, global::AttackInfo atk)
+	{
+		if (MessageDispatcher.IsAvailable && __instance != MainExperiment.Instance.Body)
+		{
+			// only show the animation and "disable" the damage done
+			atk.distance = 0;
+			atk.damage = 0;
 		}
 	}
 
