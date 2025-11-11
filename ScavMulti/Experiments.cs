@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace ScavMulti;
@@ -51,5 +52,10 @@ public class Experiments
 	public static OtherExperiment FromId(int id)
 	{
 		return _idToExpieMap[id];
+	}
+
+	public static OtherExperiment FromBody(global::Body instance)
+	{
+		return _allExperiments.FirstOrDefault(x => x.Body == instance);
 	}
 }
