@@ -41,15 +41,14 @@ public class OtherExperiment : ExperimentInfo
 		}
 	}
 
-	[HarmonyPrefix]
-	[HarmonyPatch(typeof(global::Body), nameof(global::Body.Attack))]
-	static void Body_Attack_Prefix(global::Body __instance, global::AttackInfo atk)
+	protected override void OnAttack(bool isAllowed, global::AttackInfo attackInfo)
 	{
-		if (NetMode.Online && __instance != MainExperiment.Instance.Body)
+		if (NetMode.Online)
 		{
 			// only show the animation and "disable" the damage done
-			atk.distance = 0;
-			atk.damage = 0;
+			attackInfo.damage = 0;
+			attackInfo.structuralDamage = 0;
+			attackInfo.metalMoreDamage = false;
 		}
 	}
 

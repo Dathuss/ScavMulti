@@ -1,8 +1,10 @@
 using System;
 using UnityEngine;
+using HarmonyLib;
 
 namespace ScavMulti;
 
+[HarmonyPatch]
 public abstract class ExperimentInfo : MonoBehaviour
 {
 	public int Id { get; protected set; } = int.MinValue;
@@ -64,4 +66,25 @@ public abstract class ExperimentInfo : MonoBehaviour
 			}
 		};
 	}
+
+	static ExperimentInfo GetExpieFrom(Body instance)
+	{
+		if (MainExperiment.Instance.Body == instance)
+			return MainExperiment.Instance;
+		return Experiments.FromBody(instance);
+	}
+
+	[HarmonyPrefix]
+	[HarmonyPatch(typeof(global::Body), nameof(global::Body.Attack))]
+	static void Body_Attack_Prefix(global::Body __instance, global::AttackInfo atk)
+	{
+		var expie = GetExpieFrom(__instance);
+		if (expie != null)
+		{
+			bool isAllowed = __instance.conscious && __instance.attackCooldown <= 0f;
+			expie.OnAttack(isAllowed, atk);
+		}
+	}
+
+	protected virtual void OnAttack(bool isAllowed, global::AttackInfo attackInfo) { }
 }
