@@ -93,7 +93,7 @@ public class ClientManager : MonoBehaviour
 
 	void OnWorldGenEnd()
 	{
-		IEnumerator FixWorldCoroutine()
+		IEnumerator WorldGenEndCoroutine()
 		{
 			// we have to wait one frame before fixing the world because
 			// some entities may not have been initialized yet
@@ -108,18 +108,19 @@ public class ClientManager : MonoBehaviour
 				if (reverseEntityIdentifierMap.TryGetValue(id, out BuildingEntity e) && e)
 					Object.Destroy(e.gameObject);
 			}
-		}
-		
-		if (_isJoiningWorld)
-		{
-			Logger.LogInfo("World gen finished, fixing world");
-			StartCoroutine(FixWorldCoroutine());
+			
 			MessageDispatcher.SetEndpoint(_endpoint);
 			NetMode.SetMode(NetMode.ModeClass.IAmTheClient);
 			_isJoiningWorld = false;
 			_isRunning = true;
 
 			Experiments.AddExperiment(-1, _worldInfo.CurrentExperimentPos);
+		}
+		
+		if (_isJoiningWorld)
+		{
+			Logger.LogInfo("World gen finished, fixing world");
+			StartCoroutine(WorldGenEndCoroutine());
 		}
 	}
 
