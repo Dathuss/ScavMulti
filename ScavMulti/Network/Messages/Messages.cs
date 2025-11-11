@@ -53,5 +53,6 @@ public record class ExpieUpdate(
 	[property: Key(2)] Vector2 MoveDir,
 	[property: Key(3)] bool Crouching,
 	[property: Key(4)] float CrouchAmount,
-	[property: Key(5)] Vector2 TargetLookPos
+	[property: Key(5)] Vector2 TargetLookPos,
+	[property: Key(6)] IEnumerable<UpdateEventBase> Events
 ) : MessageBase;

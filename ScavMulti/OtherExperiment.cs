@@ -24,6 +24,19 @@ public class OtherExperiment : ExperimentInfo
 		Body.crouching = expieUpdate.Crouching;
 		Body.crouchAmount = expieUpdate.CrouchAmount;
 		Body.targetLookPos = expieUpdate.TargetLookPos;
+
+		foreach (var evnt in expieUpdate.Events)
+		{
+			switch (evnt)
+			{
+				case AttackEvent:
+					Body.UseItemInHand();
+					break;
+				default:
+					Logger.LogError($"Unknown or unimplemented event received on client {Id}: {evnt.GetType()}");
+					break;
+			}
+		}
 	}
 
 	public static OtherExperiment CreateInstance(int id, Vector3 position)

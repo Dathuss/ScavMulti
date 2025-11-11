@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using ScavMulti.Network.Messages;
 using UnityEngine;
 
@@ -17,6 +18,8 @@ public class MainExperiment : ExperimentInfo
 		Instance = obj.AddComponent<MainExperiment>();
 	}
 
+	public List<UpdateEventBase> Events = new();
+
 	void LateUpdate()
 	{
 		if (MessageDispatcher.IsAvailable)
@@ -27,8 +30,10 @@ public class MainExperiment : ExperimentInfo
 				Body.moveDir,
 				Body.crouching,
 				Body.crouchAmount,
-				(Vector2)Body.targetLookPos
+				(Vector2)Body.targetLookPos,
+				Events
 			));
 		}
+		Events.Clear();
 	}
 }
