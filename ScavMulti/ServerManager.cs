@@ -89,7 +89,7 @@ public class ServerManager : MonoBehaviour
 					RunInfo.WorldGenSeed,
 					WorldGeneration.world.biomeDepth,
 					RunInfo.ModifiedBlocks,
-					RunInfo.DestroyedEntityIds
+					BuildingEntityManager.DestroyedEntityIds
 				));
 				MessageDispatcher.ForwardMessage(new ClientConnected(pendingClient.Id, mainBodyPos), pendingClient.Id);
 				Experiments.AddExperiment(pendingClient.Id, mainBodyPos);

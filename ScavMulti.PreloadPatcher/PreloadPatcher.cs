@@ -13,7 +13,6 @@ public static class PreloadPatcher
     public static IEnumerable<string> TargetDLLs { get; } = new[] {"Assembly-CSharp.dll"};
 
 	static readonly (string typeName, string methodName)[] StubDefinitions = {
-		("BuildingEntity", "OnDestroy"),
 	};
 
 	public static void Patch(AssemblyDefinition assembly)

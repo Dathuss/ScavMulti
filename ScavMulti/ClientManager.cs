@@ -88,6 +88,7 @@ public class ClientManager : MonoBehaviour
 			WorldGeneration.world.chunkHeight = _worldInfo.NumChunksY;
 			WorldGeneration.world.biomeDepth = _worldInfo.BiomeDepth;
 			UnityEngine.Random.state = _worldInfo.WorldGenSeed;
+			RunInfo.WorldGenSeed = _worldInfo.WorldGenSeed;
 		}
 	}
 
@@ -102,11 +103,14 @@ public class ClientManager : MonoBehaviour
 			{
 				WorldGeneration.world.SetBlock(kv.Key, kv.Value);
 			}
-			var reverseEntityIdentifierMap = RunInfo.ReverseEntityIdentifierMap;
+			var reverseEntityIdentifierMap = BuildingEntityManager.IdToEntityMap;
 			foreach (var id in _worldInfo.DestroyedEntities)
 			{
-				if (reverseEntityIdentifierMap.TryGetValue(id, out BuildingEntity e) && e)
+				Logger.LogInfo(id);
+				if (reverseEntityIdentifierMap.TryGetValue(id, out BuildingEntityManager e) && e)
 					Object.Destroy(e.gameObject);
+				else
+					Logger.LogWarning($"Entity with id {id} not found when fixing entities");
 			}
 			
 			MessageDispatcher.SetEndpoint(_endpoint);
