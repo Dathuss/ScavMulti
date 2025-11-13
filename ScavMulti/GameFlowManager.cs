@@ -37,11 +37,14 @@ public static class GameFlowManager
 	}
 
 	[HarmonyPostfix]
-	[HarmonyPatch(typeof(global::WorldGeneration), nameof(global::WorldGeneration.FinishWorldGeneration))]
-	static void WorldGeneration_FinishWorldGeneration_Postfix()
+	[HarmonyPatch(typeof(global::WorldGeneration), nameof(global::WorldGeneration.FinishWorldGeneration), MethodType.Enumerator)]
+	static void WorldGeneration_FinishWorldGeneration_MoveNext_Postfix(bool __result)
 	{
-		IsWorldGenerating = false;
-		OnWorldGenEnd?.Invoke();
+		if (!__result)
+		{
+			IsWorldGenerating = false;
+			OnWorldGenEnd?.Invoke();
+		}
 	}
 
 	public static IEnumerator StartRun(RunStartType runStartType)
