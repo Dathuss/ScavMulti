@@ -87,8 +87,7 @@ public class ClientManager : MonoBehaviour
 			WorldGeneration.world.chunkWidth = _worldInfo.NumChunksX;
 			WorldGeneration.world.chunkHeight = _worldInfo.NumChunksY;
 			WorldGeneration.world.biomeDepth = _worldInfo.BiomeDepth;
-			UnityEngine.Random.state = _worldInfo.WorldGenSeed;
-			RunInfo.WorldGenSeed = _worldInfo.WorldGenSeed;
+			WorldLogic.WorldGenSeed = _worldInfo.WorldGenSeed;
 		}
 	}
 

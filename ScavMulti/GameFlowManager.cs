@@ -33,6 +33,7 @@ public static class GameFlowManager
 	static void WorldGeneration_InstantiateWorld_Prefix()
 	{
 		IsWorldGenerating = true;
+		WorldLogic.WorldGenSeed = UnityEngine.Random.state;
 		OnWorldGenStart?.Invoke();
 	}
 

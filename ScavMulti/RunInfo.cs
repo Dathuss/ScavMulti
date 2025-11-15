@@ -21,20 +21,13 @@ public static class RunInfo
 
 	private static void OnWorldGenStart()
 	{
-		WorldGenSeed = UnityEngine.Random.state;
-	}
-
-	private static void OnWorldGenEnd()
-	{
 		_modifiedBlocks = new();
 	}
 
 	public static void Init()
 	{
-		GameFlowManager.OnWorldGenEnd += OnWorldGenEnd;
 		GameFlowManager.OnWorldGenStart += OnWorldGenStart;
 	} 
 
 	public static IReadOnlyDictionary<Vector2Int, ushort> ModifiedBlocks => _modifiedBlocks;
-	public static UnityEngine.Random.State WorldGenSeed { get; internal set; }
 }

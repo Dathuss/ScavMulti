@@ -27,6 +27,7 @@
 		<PackageReference Include="UnityEngine.Modules" Version="2022.3.18" IncludeAssets="compile" />
 		<PackageReference Include="MessagePack" Version="3.1.4" />
 		<PackageReference Include="MessagePack.ReactiveProperty" Version="3.1.4" />
+		<PackageReference Include="System.Numerics.Vectors" Version="4.6.1" />
 
 		<Reference Include="Assembly-CSharp" Publicize="true">
 			<HintPath>$(GameAssembliesDir)/Assembly-CSharp.dll</HintPath>
@@ -60,6 +61,7 @@
 			System.Collections.Immutable.dll;
 			System.Runtime.CompilerServices.Unsafe.dll;
 			System.Threading.Tasks.Extensions.dll;
+			System.Numerics.Vectors.dll;
 			Microsoft.Bcl.AsyncInterfaces.dll
 		</RequiredFilesToCopy>
 	</PropertyGroup>

@@ -25,7 +25,7 @@ public static class WorldLogic
 
 	[HarmonyPrefix]
 	[HarmonyPatch(typeof(global::WorldGeneration), nameof(global::WorldGeneration.DamageBlock), [typeof(Vector2Int), typeof(float), typeof(bool), typeof(bool)])]
-    static bool WorldGeneration_DamageBlock_Postfix(float dmg)
+	static bool WorldGeneration_DamageBlock_Postfix(float dmg)
 	{
 		// this is a small patch whose goal is to prevent the DamageBlock
 		// routine from executing if `dmg` is zero
@@ -37,11 +37,44 @@ public static class WorldLogic
 
 	[HarmonyPostfix]
 	[HarmonyPatch(typeof(global::WorldGeneration), nameof(global::WorldGeneration.DamageBlock), [typeof(Vector2Int), typeof(float), typeof(bool), typeof(bool)])]
-    static void WorldGeneration_DamageBlock_Postfix(Vector2Int pos, float dmg, bool bonusMetal)
+	static void WorldGeneration_DamageBlock_Postfix(Vector2Int pos, float dmg, bool bonusMetal)
 	{
 		if (NetMode.Online && !_IgnoreNextEvent)
 		{
 			MainExperiment.Instance.Events.Add(new BlockDamageEvent(pos, dmg, bonusMetal));
 		}
+	}
+
+	private static Random.State _worldGenState;
+	private static Random.State _worldGenSeed;
+	public static Random.State WorldGenSeed
+	{
+		get => _worldGenSeed;
+		internal set
+		{
+			_worldGenSeed = value;
+			_worldGenState = value;
+		}
+	}
+
+	static float WorldGen_RandomValueGetter()
+		=> RandomClone.Value(ref _worldGenState);
+	static int WorldGen_RandomRangeInt(int min, int max)
+		=> RandomClone.Range(min, max, ref _worldGenState);
+	static float WorldGen_RandomRangeFloat(float min, float max)
+		=> RandomClone.Range(min, max, ref _worldGenState);
+	static Vector2 WorldGen_RandomInsideUnitCircle()
+		=> RandomClone.InsideUnitCircle(ref _worldGenState);
+
+	public static void PatchWorldGenerationRandom(Harmony harmony)
+	{
+		var baseMethod = AccessTools.Method(typeof(global::WorldGeneration), nameof(global::WorldGeneration.GenerateWorld));
+
+		RecursiveRandomReplacer.RecursivelyPatchMethod(harmony, baseMethod, new(
+			AccessTools.Method(typeof(WorldLogic), nameof(WorldGen_RandomValueGetter)),
+			AccessTools.Method(typeof(WorldLogic), nameof(WorldGen_RandomRangeFloat)),
+			AccessTools.Method(typeof(WorldLogic), nameof(WorldGen_RandomRangeInt)),
+			AccessTools.Method(typeof(WorldLogic), nameof(WorldGen_RandomInsideUnitCircle))
+		));
 	}
 }

@@ -20,7 +20,8 @@ public class Plugin : BaseUnityPlugin
 			ScavMulti.Logger.Init(Logger);
 			_harmony = new Harmony(PluginInfo.PluginGUID);
 			_harmony.PatchAll(Assembly.GetExecutingAssembly());
-            MessagePack.MessagePackSerializer.DefaultOptions = Constants.MessagePackSerializerOptions;
+			WorldLogic.PatchWorldGenerationRandom(_harmony);
+			MessagePack.MessagePackSerializer.DefaultOptions = Constants.MessagePackSerializerOptions;
 			Utils.ProperExceptionLogger.Init();
 			AssetResolver.Init(typeof(Sprite));
 

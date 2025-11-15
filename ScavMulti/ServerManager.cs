@@ -86,7 +86,7 @@ public class ServerManager : MonoBehaviour
 					WorldGeneration.world.chunkHeight,
 					(uint)WorldGeneration.CHUNKSIZE,
 					mainBodyPos,
-					RunInfo.WorldGenSeed,
+					WorldLogic.WorldGenSeed,
 					WorldGeneration.world.biomeDepth,
 					RunInfo.ModifiedBlocks,
 					BuildingEntityManager.DestroyedEntityIds
