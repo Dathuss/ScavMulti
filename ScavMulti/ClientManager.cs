@@ -102,14 +102,13 @@ public class ClientManager : MonoBehaviour
 			{
 				WorldGeneration.world.SetBlock(kv.Key, kv.Value);
 			}
-			var reverseEntityIdentifierMap = BuildingEntityManager.IdToEntityMap;
-			foreach (var id in _worldInfo.DestroyedEntities)
+			var idToEntityMap = BuildingEntityManager.IdToEntityMap;
+			foreach (var kv in _worldInfo.DamagedEntities)
 			{
-				Logger.LogInfo(id);
-				if (reverseEntityIdentifierMap.TryGetValue(id, out BuildingEntityManager e) && e)
-					Object.Destroy(e.gameObject);
+				if (idToEntityMap.TryGetValue(kv.Key, out BuildingEntityManager e) && e)
+					e.UpdateHealth(kv.Value);
 				else
-					Logger.LogWarning($"Entity with id {id} not found when fixing entities");
+					Logger.LogWarning($"Entity with id {kv.Key} not found when fixing entities");
 			}
 			
 			MessageDispatcher.SetEndpoint(_endpoint);

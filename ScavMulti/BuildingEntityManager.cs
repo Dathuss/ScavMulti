@@ -11,11 +11,11 @@ public class BuildingEntityManager : MonoBehaviour
 #	region Static stuff
 	private static Dictionary<BuildingEntityManager, int> _entityToIdMap;
 	private static Dictionary<int, BuildingEntityManager> _idToEntityMap;
-	private static List<int> _destroyedEntityIds;
+	private static Dictionary<int, float> _damagedEntities;
 
 	public static IReadOnlyDictionary<BuildingEntityManager, int> EntityToIdMap => _entityToIdMap;
 	public static IReadOnlyDictionary<int, BuildingEntityManager> IdToEntityMap => _idToEntityMap;
-	public static IReadOnlyList<int> DestroyedEntityIds => _destroyedEntityIds;
+	public static IReadOnlyDictionary<int, float> DamagedEntities => _damagedEntities;
 
 	public static void SetupHooks()
 	{
@@ -23,7 +23,7 @@ public class BuildingEntityManager : MonoBehaviour
 		{
 			_entityToIdMap = new();
 			_idToEntityMap = new();
-			_destroyedEntityIds = new();
+			_damagedEntities = new();
 		};
 	}
 
@@ -58,26 +58,36 @@ public class BuildingEntityManager : MonoBehaviour
 		_idToEntityMap.Add(Id, this);
 	}
 
-	public void UpdateHealth(float newHealth)
+	public void UpdateHealth(float newHealth, bool dontSync = true)
 	{
 		BuildingEntity.health = newHealth;
-		_previousHealth = newHealth;
+		_ignoreNextEvent = dontSync;
 	}
 
 	void Update()
 	{
+		if (NetMode.IAmTheClient && BuildingEntity.itemsDropOnDestroy.Length > 0)
+		{
+			// only the server generates drop items
+			BuildingEntity.itemsDropOnDestroy = [];
+		}
 		if (BuildingEntity.health != _previousHealth && NetMode.Online)
 		{
-			MainExperiment.Instance.Events.Add(new EntityHealthSyncEvent(Id, BuildingEntity.health));
+			if (!_ignoreNextEvent)
+				MainExperiment.Instance.Events.Add(new EntityHealthSyncEvent(Id, BuildingEntity.health));
+			_damagedEntities[Id] = BuildingEntity.health;
+			_ignoreNextEvent = false;
+			_previousHealth = BuildingEntity.health;
 		}
-		_previousHealth = BuildingEntity.health;
 	}
 
 	void OnDestroy()
 	{
 		if (!GameFlowManager.IsWorldGenerating)
 		{
-			_destroyedEntityIds.Add(Id);
+			if (!_ignoreNextEvent)
+				MainExperiment.Instance.Events.Add(new EntityHealthSyncEvent(Id, 0));
+			_damagedEntities[Id] = 0;
 			_entityToIdMap.Remove(this);
 			_idToEntityMap.Remove(Id);
 		}

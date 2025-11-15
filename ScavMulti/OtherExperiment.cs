@@ -38,6 +38,12 @@ public class OtherExperiment : ExperimentInfo
 					WorldLogic.IgnoreNextEvent();
 					global::WorldGeneration.world.DamageBlock(blockDamageEvent.Pos, blockDamageEvent.Damage, bonusMetal: blockDamageEvent.BonusMetal);
 					break;
+				case EntityHealthSyncEvent healthSyncEvent:
+					if (BuildingEntityManager.IdToEntityMap.TryGetValue(healthSyncEvent.EntityId, out var buildingEntity))
+						buildingEntity.UpdateHealth(healthSyncEvent.NewHealth);
+					else
+						Logger.LogWarning($"EntityHealthSyncEvent received with unknown entity id {healthSyncEvent.EntityId}");
+					break;
 				default:
 					Logger.LogError($"Unknown or unimplemented event received on client {Id}: {evnt.GetType()}");
 					break;

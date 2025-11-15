@@ -28,7 +28,7 @@ public record class WorldInfo(
 	[property: Key(4)] UnityEngine.Random.State WorldGenSeed,
 	[property: Key(5)] int BiomeDepth,
 	[property: Key(6)] IReadOnlyDictionary<Vector2Int, ushort> ModifiedBlocks,
-	[property: Key(7)] IEnumerable<int> DestroyedEntities
+	[property: Key(7)] IReadOnlyDictionary<int, float> DamagedEntities
 
 ) : MessageBase;
 

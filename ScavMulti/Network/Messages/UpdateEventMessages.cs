@@ -14,3 +14,8 @@ public record class BlockDamageEvent(
 	[property: Key(2)] bool BonusMetal
 ) : UpdateEventBase;
 
+[MessagePackObject]
+public record class EntityHealthSyncEvent(
+	[property: Key(0)] int EntityId,
+	[property: Key(1)] float NewHealth
+) : UpdateEventBase;
