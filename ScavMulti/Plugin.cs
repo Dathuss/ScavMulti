@@ -34,6 +34,7 @@ public class Plugin : BaseUnityPlugin
 		}
 		catch (Exception e)
 		{
+			_harmony?.UnpatchSelf();
 			Logger.LogError($"Exception thrown on initialization of {PluginInfo.PluginGUID}:\n{e}");
 			throw;
 		}
