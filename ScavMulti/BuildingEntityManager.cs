@@ -9,7 +9,6 @@ namespace ScavMulti;
 public class BuildingEntityManager : MonoBehaviour
 {
 #	region Static stuff
-	private static int _currentMaxEntityId;
 	private static Dictionary<BuildingEntityManager, int> _entityToIdMap;
 	private static Dictionary<int, BuildingEntityManager> _idToEntityMap;
 	private static List<int> _destroyedEntityIds;
@@ -25,7 +24,6 @@ public class BuildingEntityManager : MonoBehaviour
 			_entityToIdMap = new();
 			_idToEntityMap = new();
 			_destroyedEntityIds = new();
-			_currentMaxEntityId = 0;
 		};
 	}
 
@@ -37,6 +35,7 @@ public class BuildingEntityManager : MonoBehaviour
 	}
 #	endregion
 
+	private bool _ignoreNextEvent = false;
 	private float _previousHealth;
 	public global::BuildingEntity BuildingEntity { get; private set; }
 	public int Id { get; private set; }
@@ -45,12 +44,18 @@ public class BuildingEntityManager : MonoBehaviour
 	{
 		BuildingEntity = GetComponent<BuildingEntity>();
 		_previousHealth = BuildingEntity.health;
-		Id = _currentMaxEntityId++;
-		if (!_entityToIdMap.ContainsKey(this))
+		int seed = 0;
+		void CombineHash(int hash)
 		{
-			_entityToIdMap.Add(this, Id);
-			_idToEntityMap.Add(Id, this);
+			seed ^= (int)(hash + 0x9e3779b9) + (seed << 6) + (seed >> 2);
 		}
+		CombineHash(transform.position.x.GetHashCode());
+		CombineHash(transform.position.y.GetHashCode());
+		CombineHash(transform.position.z.GetHashCode());
+		CombineHash(transform.rotation.z.GetHashCode());
+		Id = seed;
+		_entityToIdMap.Add(this, Id);
+		_idToEntityMap.Add(Id, this);
 	}
 
 	public void UpdateHealth(float newHealth)
