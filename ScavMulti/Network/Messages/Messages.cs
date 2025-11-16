@@ -39,6 +39,12 @@ public record class WorldState(
 ) : MessageBase;
 
 /// <summary>
+/// sent by a client after it is fully ready to start playing
+/// </summary>
+[MessagePackObject]
+public record class IAmReady : MessageBase;
+
+/// <summary>
 /// sent by the server to notify a new client has joined
 /// </summary>
 [MessagePackObject]

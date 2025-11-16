@@ -8,13 +8,19 @@ namespace ScavMulti.Network;
 
 public partial class Client
 {
+	[Flags]
 	public enum ClientState
 	{
-		NotRunningYet,
-		Running,
-		Cancelled,
-		CancelledFromSend,
-		CancelledFromRecv,
+		NotRunningYet = 1 << 0,
+		Running = 1 << 1,
+		/// <summary>
+		/// This doesnt represent a network state by itself, it just means the client's game
+		/// has finished fully loading
+		/// </summary>
+		FullyRunning = Running | (1 << 2),
+		Cancelled = 1 << 3,
+		CancelledFromSend = Cancelled | (1 << 4),
+		CancelledFromRecv = Cancelled | (1 << 5),
 	}
 
 	private class ClientCancellationContext : IDisposable
@@ -72,6 +78,12 @@ public partial class Client
 		{
 			if (State == ClientState.NotRunningYet)
 				State = ClientState.Running;
+		}
+
+		public void SetIsFullyRunning()
+		{
+			if (State == ClientState.Running)
+				State = ClientState.FullyRunning;
 		}
 
 		public void Dispose()

@@ -27,12 +27,12 @@ public static class MessageDispatcher
 		_clientInstance = null;
 	}
 
-	public static void DispatchMessage(MessageBase message)
+	public static void DispatchMessage(MessageBase message, bool requiresFullyRunningClient = true)
 	{
 		if (_serverInstance != null)
 		{
 			message.SourceId = -1; // server id
-			_serverInstance.SendToAllClients(message);
+			_serverInstance.SendToAllClients(message, requiresFullyRunningClient);
 		}
 		else if (_clientInstance != null)
 		{
@@ -45,12 +45,12 @@ public static class MessageDispatcher
 			throw new InvalidOperationException("DispatchMessage called with no available endpoint");
 	}
 
-	public static void ForwardMessage(MessageBase message, int clientId)
+	public static void ForwardMessage(MessageBase message, int clientId, bool requiresFullyRunningClient = true)
 	{
 		if (_serverInstance != null)
 		{
 			message.SourceId = clientId;
-			_serverInstance.SendToAllClientsExcept(message, clientId);
+			_serverInstance.SendToAllClientsExcept(message, clientId, requiresFullyRunningClient);
 		}
 		else
 			throw new InvalidOperationException("ForwardMessage called when I am not the server");

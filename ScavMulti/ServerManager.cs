@@ -56,6 +56,15 @@ public class ServerManager : MonoBehaviour
 	{
 		switch (message)
 		{
+			case IAmReady:
+				if (!client.IsFullyRunning)
+				{
+					var mainBodyPos = transform.position;
+					MessageDispatcher.ForwardMessage(new ClientConnected(client.Id, mainBodyPos), client.Id);
+					Experiments.AddExperiment(client.Id, mainBodyPos);
+					client.SetIsFullyRunning();
+				}
+				return true;
 			case WorldStateRequest:
 				client.Enqueue(new WorldState(
 					MainExperiment.Instance.transform.position,
@@ -104,8 +113,6 @@ public class ServerManager : MonoBehaviour
 					WorldLogic.WorldGenSeed,
 					WorldGeneration.world.biomeDepth
 				));
-				MessageDispatcher.ForwardMessage(new ClientConnected(pendingClient.Id, mainBodyPos), pendingClient.Id);
-				Experiments.AddExperiment(pendingClient.Id, mainBodyPos);
 			}
 		}
 	}

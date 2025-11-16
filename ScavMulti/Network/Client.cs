@@ -34,7 +34,7 @@ public partial class Client : IDisposable
 				throw new InvalidOperationException("Client.Id field accessed before it has been set");
 			return _id;
 		}
-		set
+		internal set
 		{
 			if (_idHasBeenSet)
 				throw new InvalidOperationException("Client.Id field has already been set");
@@ -43,7 +43,12 @@ public partial class Client : IDisposable
 		}
 	}
 	public ClientState State => _cancellationContext.State;
-	public bool IsRunning => _cancellationContext.State == ClientState.Running;
+	public bool IsRunning => (_cancellationContext.State & ClientState.Running) != 0;
+	/// <summary>
+	/// Is true if the client has entered the world and can receive sync updates
+	/// </summary>
+	public bool IsFullyRunning => _cancellationContext.State == ClientState.FullyRunning;
+	internal void SetIsFullyRunning() => _cancellationContext.SetIsFullyRunning();
 	public ClientCancelledException ClientCancelledException => _cancellationContext.ClientCancelledException;
 
 	public Client(Socket sock)
@@ -62,7 +67,7 @@ public partial class Client : IDisposable
 	{
 		if (_cancellationContext.State == ClientState.NotRunningYet)
 			throw new InvalidOperationException("Client is not running");
-		else if (_cancellationContext.State != ClientState.Running)
+		else if (!IsRunning)
 			throw ClientCancelledException;
 	}
 

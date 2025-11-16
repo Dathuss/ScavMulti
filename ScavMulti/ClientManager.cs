@@ -110,7 +110,8 @@ public class ClientManager : MonoBehaviour
 				else
 					Logger.LogWarning($"Entity with id {kv.Key} not found when fixing entities");
 			}
-			
+
+			_endpoint.Enqueue(new IAmReady());
 			MessageDispatcher.SetEndpoint(_endpoint);
 			NetMode.SetMode(NetMode.ModeClass.IAmTheClient);
 			_isJoiningWorld = false;

@@ -122,20 +122,21 @@ public class Server : IEnumerable<Client>, IDisposable
 		return array;
 	}
 
-	public void SendToAllClients(MessageBase message)
+	public void SendToAllClients(MessageBase message, bool requiresFullyRunningClient)
 	{
 		var buffer = PrepareBufferForMultipleSend(message, out int length);
 		foreach (var client in _clients)
 		{
 			try
 			{
-				client.Enqueue(buffer, length, false);
+				if (client.IsFullyRunning || !requiresFullyRunningClient)
+					client.Enqueue(buffer, length, false);
 			}
 			catch (ClientCancelledException) { }
 		}
 	}
 
-	public void SendToAllClientsExcept(MessageBase message, int clientIdToNotSentTo)
+	public void SendToAllClientsExcept(MessageBase message, int clientIdToNotSentTo, bool requiresFullyRunningClient)
 	{
 		// don't even serialize the message if there's only one client
 		if (_clients.Count == 1 && _clients[0].Id == clientIdToNotSentTo)
@@ -145,7 +146,8 @@ public class Server : IEnumerable<Client>, IDisposable
 		{
 			try
 			{
-				client.Enqueue(buffer, length, false);
+				if (client.IsFullyRunning || !requiresFullyRunningClient)
+					client.Enqueue(buffer, length, false);
 			}
 			catch (ClientCancelledException) { }
 		}
