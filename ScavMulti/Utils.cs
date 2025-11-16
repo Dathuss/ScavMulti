@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using BepInEx.Logging;
 using UnityEngine;
 
 namespace ScavMulti;
@@ -41,21 +42,30 @@ public static class Utils
 	
 	// The default unity exception log handler for doesn't output the stack trace.
 	// Little hack so that it does
-	public class ProperExceptionLogger(ILogHandler original) : ILogHandler
+	public class ProperExceptionLogger : ILogHandler
 	{
 		public static void Init()
 		{
-			Debug.unityLogger.logHandler = new ProperExceptionLogger(Debug.unityLogger.logHandler);
+			Debug.unityLogger.logHandler = new ProperExceptionLogger();
 		}
 
 		public void LogException(Exception exception, UnityEngine.Object context)
 		{
-			original.LogFormat(LogType.Error, null, "Exception occured: {0}", exception);
+			Logger.LogError($"Exception occured: {exception}");
 		}
 
 		public void LogFormat(LogType logType, UnityEngine.Object context, string format, params object[] args)
 		{
-			original.LogFormat(logType, context, format, args);
+			var logLevel = logType switch
+			{
+				LogType.Error => LogLevel.Error,
+				LogType.Assert => LogLevel.Error,
+				LogType.Warning => LogLevel.Warning,
+				LogType.Log => LogLevel.Info,
+				LogType.Exception => LogLevel.Fatal,
+				_ => LogLevel.None
+			};
+			Logger.Log(logLevel, string.Format(format, args));
 		}
 	}
 }
