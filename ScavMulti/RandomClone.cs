@@ -11,12 +11,6 @@ namespace ScavMulti;
 /// </summary>
 public static class RandomClone
 {
-	static System.IO.StreamWriter _writer;
-	static RandomClone()
-	{
-		_writer = new(System.IO.File.Create($"{new System.Random().Next(500)}"));
-	}
-
 	static uint GetRand(ref Random.State state)
 	{
 		// https://www.jstatsoft.org/article/download/v008i14/916
@@ -49,7 +43,6 @@ public static class RandomClone
 	public static float Value(ref Random.State state)
 	{
 		float result = GetRandFloat(ref state);
-		_writer.WriteLine(result);
 		return result;
 	}
 
@@ -67,7 +60,6 @@ public static class RandomClone
 		System.Numerics.Vector<float> minV = new(min);
 		System.Numerics.Vector<float> maxV = new(max);
 		float res = (float)((oneV - randV) * maxV + randV * minV)[0];
-		_writer.WriteLine(res);
 		return res;
 	}
 
@@ -83,7 +75,6 @@ public static class RandomClone
 		{
 			result = (int)(min - GetRand(ref state) % (min - max));
 		}
-		_writer.WriteLine(result);
 		return result;
 	}
 
@@ -95,7 +86,6 @@ public static class RandomClone
 		float sin = Mathf.Sin(theta);
 		float length = Mathf.Sqrt(1 - GetRandFloat(ref state));
 		var res = new Vector2(sin * length, cos * length);
-		_writer.WriteLine(res);
 		return res;
 	}
 }
