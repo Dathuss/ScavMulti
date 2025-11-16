@@ -23,13 +23,19 @@ public record class PeerHandshake(
 public record class WorldInfo(
 	[property: Key(0)] uint NumChunksX,
 	[property: Key(1)] uint NumChunksY,
-	[property: Key(2)] uint ChunkSize,
-	[property: Key(3)] Vector3 CurrentExperimentPos,
+	[property: Key(3)] uint ChunkSize,
 	[property: Key(4)] UnityEngine.Random.State WorldGenSeed,
-	[property: Key(5)] int BiomeDepth,
-	[property: Key(6)] IReadOnlyDictionary<Vector2Int, ushort> ModifiedBlocks,
-	[property: Key(7)] IReadOnlyDictionary<int, float> DamagedEntities
+	[property: Key(5)] int BiomeDepth
+) : MessageBase;
 
+[MessagePackObject]
+public record class WorldStateRequest : MessageBase;
+
+[MessagePackObject]
+public record class WorldState(
+	[property: Key(0)] Vector3 CurrentExperimentPos,
+	[property: Key(1)] IReadOnlyDictionary<Vector2Int, ushort> ModifiedBlocks,
+	[property: Key(2)] IReadOnlyDictionary<int, float> DamagedEntities
 ) : MessageBase;
 
 /// <summary>

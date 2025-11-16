@@ -95,15 +95,15 @@ public class ClientManager : MonoBehaviour
 	{
 		IEnumerator WorldGenEndCoroutine()
 		{
-			// we have to wait one frame before fixing the world because
-			// some entities may not have been initialized yet
-			yield return new WaitForEndOfFrame();
-			foreach (var kv in _worldInfo.ModifiedBlocks)
+			_endpoint.Enqueue(new WorldStateRequest());
+			yield return _endpoint.WaitUntilHasData();
+			var state = _endpoint.Dequeue<WorldState>();
+			foreach (var kv in state.ModifiedBlocks)
 			{
 				WorldGeneration.world.SetBlock(kv.Key, kv.Value);
 			}
 			var idToEntityMap = BuildingEntityManager.IdToEntityMap;
-			foreach (var kv in _worldInfo.DamagedEntities)
+			foreach (var kv in state.DamagedEntities)
 			{
 				if (idToEntityMap.TryGetValue(kv.Key, out BuildingEntityManager e) && e)
 					e.UpdateHealth(kv.Value);
@@ -116,7 +116,7 @@ public class ClientManager : MonoBehaviour
 			_isJoiningWorld = false;
 			_isRunning = true;
 
-			Experiments.AddExperiment(-1, _worldInfo.CurrentExperimentPos);
+			Experiments.AddExperiment(-1, state.CurrentExperimentPos);
 		}
 		
 		if (_isJoiningWorld)

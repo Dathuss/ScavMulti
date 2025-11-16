@@ -52,6 +52,21 @@ public class ServerManager : MonoBehaviour
 		}
 	}
 
+	bool HandleServerMessage(MessageBase message, Client client)
+	{
+		switch (message)
+		{
+			case WorldStateRequest:
+				client.Enqueue(new WorldState(
+					MainExperiment.Instance.transform.position,
+					RunInfo.ModifiedBlocks,
+					BuildingEntityManager.DamagedEntities
+				));
+				return true;
+		}
+		return false;
+	}
+
 	void LateUpdate()
 	{
 		if (_isRunning)
@@ -69,7 +84,8 @@ public class ServerManager : MonoBehaviour
 				{
 					var message = client.Dequeue();
 					message.SourceId = client.Id;
-					MessageHandler.Instance.HandleMessage(message);
+					if (!HandleServerMessage(message, client))
+						MessageHandler.Instance.HandleMessage(message);
 				}
 			}
 
@@ -85,11 +101,8 @@ public class ServerManager : MonoBehaviour
 					WorldGeneration.world.chunkWidth,
 					WorldGeneration.world.chunkHeight,
 					(uint)WorldGeneration.CHUNKSIZE,
-					mainBodyPos,
 					WorldLogic.WorldGenSeed,
-					WorldGeneration.world.biomeDepth,
-					RunInfo.ModifiedBlocks,
-					BuildingEntityManager.DamagedEntities
+					WorldGeneration.world.biomeDepth
 				));
 				MessageDispatcher.ForwardMessage(new ClientConnected(pendingClient.Id, mainBodyPos), pendingClient.Id);
 				Experiments.AddExperiment(pendingClient.Id, mainBodyPos);
