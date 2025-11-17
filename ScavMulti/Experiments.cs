@@ -58,4 +58,15 @@ public class Experiments
 	{
 		return _allExperiments.FirstOrDefault(x => x.Body == instance);
 	}
+
+	public static float SmallestExpieDistance(Vector2 pos)
+	{
+		float minDist = float.MaxValue;
+		foreach (var expie in _allExperiments)
+		{
+			minDist = Mathf.Min(minDist, Vector2.Distance(expie.Body.transform.position, pos));
+		}
+		minDist = Mathf.Min(minDist, Vector2.Distance(MainExperiment.Instance.Body.transform.position, pos));
+		return minDist;
+	}
 }
