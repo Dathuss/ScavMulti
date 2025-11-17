@@ -39,7 +39,7 @@ public static class WorldLogic
 	[HarmonyPatch(typeof(global::WorldGeneration), nameof(global::WorldGeneration.DamageBlock), [typeof(Vector2Int), typeof(float), typeof(bool), typeof(bool)])]
 	static void WorldGeneration_DamageBlock_Postfix(Vector2Int pos, float dmg, bool bonusMetal)
 	{
-		if (NetMode.Online && !_IgnoreNextEvent)
+		if (NetMode.OnlineAndPlaying && !_IgnoreNextEvent)
 		{
 			MainExperiment.Instance.Events.Add(new BlockDamageEvent(pos, dmg, bonusMetal));
 		}

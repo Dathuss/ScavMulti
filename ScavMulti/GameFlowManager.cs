@@ -25,6 +25,7 @@ public static class GameFlowManager
 	[HarmonyPatch(typeof(global::PlayerCamera), nameof(global::PlayerCamera.ToMainMenu))]
 	static void PlayerCamera_ToMainMenu_Prefix()
 	{
+		IsPlaying = false;
 		OnRunLeave?.Invoke();
 	}
 
@@ -64,6 +65,7 @@ public static class GameFlowManager
 	public static event Action OnWorldGenEnd;
 
 	public static bool IsWorldGenerating { get; private set; } = false;
+	public static bool IsPlaying { get; internal set; } = false;
 }
 
 public enum RunStartType

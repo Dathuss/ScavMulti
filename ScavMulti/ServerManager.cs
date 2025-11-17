@@ -33,6 +33,7 @@ public class ServerManager : MonoBehaviour
 	{
 		if (runStartType == RunStartType.NewRun || runStartType == RunStartType.Continue)
 		{
+			NetMode.SetMode(NetMode.ModeClass.IAmTheServer);
 			_willServerRun = true;
 		}
 	}
@@ -46,7 +47,7 @@ public class ServerManager : MonoBehaviour
 			_server = new(ep);
 			_server.Run();
 			MessageDispatcher.SetEndpoint(_server);
-			NetMode.SetMode(NetMode.ModeClass.IAmTheServer);
+			GameFlowManager.IsPlaying = true;
 			_willServerRun = false;
 			_isRunning = true;
 		}

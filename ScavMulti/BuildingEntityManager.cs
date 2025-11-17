@@ -71,7 +71,7 @@ public class BuildingEntityManager : MonoBehaviour
 			// only the server generates drop items
 			BuildingEntity.itemsDropOnDestroy = [];
 		}
-		if (BuildingEntity.health != _previousHealth && NetMode.Online)
+		if (BuildingEntity.health != _previousHealth && NetMode.OnlineAndPlaying)
 		{
 			if (!_ignoreNextEvent)
 				MainExperiment.Instance.Events.Add(new EntityHealthSyncEvent(Id, BuildingEntity.health));

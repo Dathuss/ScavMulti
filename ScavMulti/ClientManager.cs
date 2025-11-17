@@ -88,6 +88,8 @@ public class ClientManager : MonoBehaviour
 			WorldGeneration.world.chunkHeight = _worldInfo.NumChunksY;
 			WorldGeneration.world.biomeDepth = _worldInfo.BiomeDepth;
 			WorldLogic.WorldGenSeed = _worldInfo.WorldGenSeed;
+			NetMode.SetMode(NetMode.ModeClass.IAmTheClient);
+			MessageDispatcher.SetEndpoint(_endpoint);
 		}
 	}
 
@@ -112,12 +114,11 @@ public class ClientManager : MonoBehaviour
 			}
 
 			_endpoint.Enqueue(new IAmReady());
-			MessageDispatcher.SetEndpoint(_endpoint);
-			NetMode.SetMode(NetMode.ModeClass.IAmTheClient);
 			_isJoiningWorld = false;
 			_isRunning = true;
 
 			Experiments.AddExperiment(-1, state.CurrentExperimentPos);
+			GameFlowManager.IsPlaying = true;
 		}
 		
 		if (_isJoiningWorld)

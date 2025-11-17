@@ -22,7 +22,7 @@ public class MainExperiment : ExperimentInfo
 
 	void LateUpdate()
 	{
-		if (NetMode.Online)
+		if (NetMode.OnlineAndPlaying)
 		{
 			MessageDispatcher.DispatchMessage(new ExpieUpdate(
 				Body.transform.position,
@@ -39,7 +39,7 @@ public class MainExperiment : ExperimentInfo
 
 	protected override void OnAttack(bool isAllowed, global::AttackInfo attackInfo)
 	{
-		if (NetMode.Online && isAllowed)
+		if (NetMode.OnlineAndPlaying && isAllowed)
 		{
 			MainExperiment.Instance.Events.Add(new AttackEvent());
 		}
