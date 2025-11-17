@@ -44,6 +44,25 @@ public class OtherExperiment : ExperimentInfo
 					else
 						Logger.LogWarning($"EntityHealthSyncEvent received with unknown entity id {healthSyncEvent.EntityId}");
 					break;
+				case ItemCreateEvent itemCreateEvent:
+					if (expieUpdate.SourceId >= 0)
+					{
+						Logger.LogError($"ItemCreateEvent received from {expieUpdate.SourceId}, which is not the server");
+						break;
+					}
+					ItemManager.CreateItem(itemCreateEvent);
+					break;
+				case ItemUpdateEvent itemUpdateEvent:
+					if (expieUpdate.SourceId >= 0)
+					{
+						Logger.LogError($"ItemUpdateEvent received from {expieUpdate.SourceId}, which is not the server");
+						break;
+					}
+					if (ItemManager.ItemMap.TryGetValue(itemUpdateEvent.Id, out var item))
+						item.ApplyUpdate(itemUpdateEvent);
+					else
+						Logger.LogError($"ItemUpdateEvent targets unknown item {itemUpdateEvent.Id}");
+					break;
 				default:
 					Logger.LogError($"Unknown or unimplemented event received on client {Id}: {evnt.GetType()}");
 					break;

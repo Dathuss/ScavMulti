@@ -113,6 +113,13 @@ public class ClientManager : MonoBehaviour
 					Logger.LogWarning($"Entity with id {kv.Key} not found when fixing entities");
 			}
 
+			ItemManager.DestroyAllItemsLocally();
+
+			foreach (var itemCreateEvent in state.Items)
+			{
+				ItemManager.CreateItem(itemCreateEvent);
+			}
+
 			_endpoint.Enqueue(new IAmReady());
 			_isJoiningWorld = false;
 			_isRunning = true;

@@ -31,6 +31,7 @@ public class Plugin : BaseUnityPlugin
 			MessageHandler.CreateInstance();
 			ExperimentInfo.SetupHooks();
 			BuildingEntityManager.SetupHooks();
+			ItemManager.SetupHooks();
 		}
 		catch (Exception e)
 		{

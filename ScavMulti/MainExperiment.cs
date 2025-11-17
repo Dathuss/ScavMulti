@@ -33,6 +33,7 @@ public class MainExperiment : ExperimentInfo
 				(Vector2)Body.targetLookPos,
 				Events
 			));
+			ItemManager.ResetNumberOfEventsSentThisFrame();
 		}
 		Events.Clear();
 	}

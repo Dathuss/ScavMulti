@@ -1,4 +1,5 @@
 using System.Net;
+using System.Collections.Generic;
 using UnityEngine;
 using ScavMulti.Network;
 using ScavMulti.Network.Messages;
@@ -53,6 +54,8 @@ public class ServerManager : MonoBehaviour
 		}
 	}
 
+	static readonly List<ItemCreateEvent> _itemInitialSendBuffer = [];
+
 	bool HandleServerMessage(MessageBase message, Client client)
 	{
 		switch (message)
@@ -67,11 +70,14 @@ public class ServerManager : MonoBehaviour
 				}
 				return true;
 			case WorldStateRequest:
+				ItemManager.MakeItemCreateEvents(_itemInitialSendBuffer);
 				client.Enqueue(new WorldState(
 					MainExperiment.Instance.transform.position,
 					RunInfo.ModifiedBlocks,
-					BuildingEntityManager.DamagedEntities
+					BuildingEntityManager.DamagedEntities,
+					_itemInitialSendBuffer
 				));
+				_itemInitialSendBuffer.Clear();
 				return true;
 		}
 		return false;

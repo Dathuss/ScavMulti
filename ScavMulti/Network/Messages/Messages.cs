@@ -35,7 +35,8 @@ public record class WorldStateRequest : MessageBase;
 public record class WorldState(
 	[property: Key(0)] Vector3 CurrentExperimentPos,
 	[property: Key(1)] IReadOnlyDictionary<Vector2Int, ushort> ModifiedBlocks,
-	[property: Key(2)] IReadOnlyDictionary<int, float> DamagedEntities
+	[property: Key(2)] IReadOnlyDictionary<int, float> DamagedEntities,
+	[property: Key(3)] IEnumerable<ItemCreateEvent> Items
 ) : MessageBase;
 
 /// <summary>
