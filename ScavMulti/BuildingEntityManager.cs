@@ -56,6 +56,11 @@ public class BuildingEntityManager : MonoBehaviour
 		Id = seed;
 		_entityToIdMap.Add(this, Id);
 		_idToEntityMap.Add(Id, this);
+		if (NetMode.IAmTheClient && BuildingEntity.itemsDropOnDestroy.Length > 0)
+		{
+			// only the server generates drop items
+			BuildingEntity.itemsDropOnDestroy = [];
+		}
 	}
 
 	public void UpdateHealth(float newHealth, bool dontSync = true)
